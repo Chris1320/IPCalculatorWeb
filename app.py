@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 
 
 class IPAddress:
@@ -245,7 +245,18 @@ def printNetworkInfo(ip: IPAddress, mask: SubnetMask, network: Network):
     print()
 
 
-def main() -> int:
+app = Flask(__name__)
+
+
+@app.route("/")
+def indexPage() -> str:
+    return render_template("index.html")
+
+
+def main():
+    app.run()
+
+def oldMain()-> int:
     while True:
         print('=' * 40)
         print("What do you want to do?")
