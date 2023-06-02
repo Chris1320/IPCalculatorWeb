@@ -8,10 +8,12 @@
     </head>
     <body>
         <h1>IP Address Calculator</h1>
-        <h2>Subnet mask conversion</h2>
-        <form action="{{ url_for('subnetMaskCalculator') }}" method="POST">
-            <label for="mask">Subnet Mask (prefix <code>/</code> for CIDR):</label>
-            <input type="text" id="mask" name="mask" placeholder="" required/>
+        <h2>Get network information</h2>
+        <form action="{{ url_for('networkInfo') }}" method="POST">
+            <label for="ipAddress">IP address</label>
+            <input type="text" name="ipAddress" id="ipAddress" placeholder="" required><br/>
+            <label for="subnetMask">Subnet mask</label>
+            <input type="text" name="subnetMask" id="subnetMask" placeholder="" required><br/>
             <input type="submit" value="Convert">
         </form>
         <a href="{{ url_for('indexPage') }}">Back to home</a>

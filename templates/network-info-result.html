@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2{{ title }}</h2>
+        {% for network in networks %}
+            <div>
+                <h3>Information about {{ network.network_address.decimal }}/{{ network.subnet_mask.cidr }}</h3>
+                <table>
+                    <tr>
+                        <td>Network address</td>
+                        <td>{{ network.network_address.decimal }}</td>
+                    </tr>
+                    <tr>
+                        <td>Subnet mask</td>
+                    <td>{{ network.subnet_mask.decimal }} (/{{ network.subnet_mask.cidr }})</td>
+                    </tr>
+                    <tr>
+                        <td>Broadcast address</td>
+                        <td>{{ getBroadcastAddr(network) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Interval</td>
+                    <td>{{ network.subnet_mask.total }} {{ getAltInterval(network) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Usable addresses</td>
+                        <td>{{ network.subnet_mask.usable }}</td>
+                    </tr>
+                    <tr>
+                        <td>First usable address</td>
+                        <td>{{ getFirstUsable(network) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Last usable address</td>
+                        <td>{{ getLastUsable(network) }}</td>
+                    </tr>
+                </table>
+            </div>
+        {% endfor %}
+        <a href="{{ url_for('indexPage') }}">Back to home</a>
+    </body>
+</html>

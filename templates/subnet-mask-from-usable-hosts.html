@@ -11,7 +11,7 @@
         <h2>Get subnet mask from number of usable hosts</h2>
         <form action="{{ url_for('subnetMaskFromUsableHosts') }}" method="POST">
             <label for="hosts">Enter number of hosts needed: </label>
-            <input type="text" id="hosts" name="hosts" placeholder=""/><br/>
+            <input type="text" id="hosts" name="hosts" placeholder="" required/><br/>
             <label for="use_total">Include network and broadcast address</label>
             <input type="checkbox" id="use_total" name="use_total"><br/>
             <input type="submit" value="Convert">

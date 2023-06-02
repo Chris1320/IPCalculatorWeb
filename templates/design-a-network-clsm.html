@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>Design a network! (Constant subnet mask)</h2>
+        <form action="{{ url_for('designANetworkCLSM') }}" method="POST">
+            <label for="ipAddress">IP address</label>
+            <input type="text" name="ipAddress" id="ipAddress" placeholder="" required><br/>
+            <label for="subnetMask">Subnet mask</label>
+            <input type="text" name="subnetMask" id="subnetMask" placeholder="" required><br/>
+            <label for="num_of_networks">Enter how many networks to make</label>
+            <input type="text" name="num_of_networks" id="num_of_networks" placeholder="" required><br/>
+            <input type="submit" value="Convert">
+        </form>
+        <a href="{{ url_for('indexPage') }}">Back to home</a>
+    </body>
+</html>

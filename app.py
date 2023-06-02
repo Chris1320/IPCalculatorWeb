@@ -196,6 +196,7 @@ class Network:
 
         return IPAddress('.'.join(network_octets))
 
+
 def getMaskFromNeededHosts(hosts: int, use_total: bool = False) -> SubnetMask | None:
     """
     Get the smallest subnet mask that can fit the number of hosts.
@@ -216,34 +217,29 @@ def getMaskFromNeededHosts(hosts: int, use_total: bool = False) -> SubnetMask | 
     return None
 
 
-def printNetworkInfo(ip: IPAddress, mask: SubnetMask, network: Network):
-    print()
-    print(f"Information about {ip.decimal}/{mask.cidr}:")
-    print()
-    print(f"Network address:      {network.network_address.decimal}")
-    print(f"Subnet mask:          {network.subnet_mask.decimal} (/{network.subnet_mask.cidr})")
+def getBroadcastAddr(network):
     try:
-        print(f"Broadcast address:    {network.broadcast_address.decimal}")
+        return network.broadcast_address.decimal
 
     except ValueError as e:
-        print(f"Broadcast address:    {e}")
+        return e
 
-    alt_interval = 'or 1' if network.subnet_mask.total == 256 else ''
-    print(f"Interval:             {network.subnet_mask.total} {alt_interval}")
-    print(f"Usable addresses:     {network.subnet_mask.usable}")
-    try:
-        print(f"First usable address: {network.first_and_last_usable[0].decimal}")
-    except ValueError as e:
-        print(f"Fist usable address:  {e}")
+def getAltInterval(network):
+    return 'or 1' if network.subnet_mask.total == 256 else ''
 
+def getFirstUsable(network):
     try:
-        print(f"Last usable address:  {network.first_and_last_usable[1].decimal}")
+        return network.first_and_last_usable[0].decimal
 
     except ValueError as e:
-        print(f"Last usable address:  {e}")
+        return e
 
-    print()
+def getLastUsable(network):
+    try:
+        return network.first_and_last_usable[1].decimal
 
+    except ValueError as e:
+        return e
 
 app = Flask(__name__)
 
@@ -321,19 +317,63 @@ def subnetMaskFromUsableHosts() -> str:
         return render_template("subnet-mask-from-usable-hosts.html")
 
 
-@app.route("/subnet-mask-from-total-hosts")
-def subnetMaskFromTotalHosts() -> str:
-    return "Subnet Mask from Total Hosts"
-
-
-@app.route("/network-info")
+@app.route("/network-info", methods = ["GET", "POST"])
 def networkInfo() -> str:
-    return "Network Info"
+    if request.method == "POST":
+        try:
+            ip = IPAddress(request.form["ipAddress"])
+            mask = SubnetMask(request.form["subnetMask"])
+            network = Network(ip, mask)
 
 
-@app.route("/design-a-network-clsm")
+            return render_template(
+                "network-info-result.html",
+                title = "Get network information",
+                getBroadcastAddr = getBroadcastAddr,
+                getAltInterval = getAltInterval,
+                getFirstUsable = getFirstUsable,
+                getLastUsable = getLastUsable,
+                networks = (network,)
+            )
+
+        except ValueError as e:
+            return render_template("error.html", desc=e)
+
+    else:
+        return render_template("network-info.html")
+
+
+@app.route("/design-a-network-clsm", methods = ["GET", "POST"])
 def designANetworkCLSM() -> str:
-    return "Design a Network (CLSM)"
+    if request.method == "POST":
+        try:
+            ip = IPAddress(request.form["ipAddress"])
+            mask = SubnetMask(request.form["subnetMask"])
+            num_of_networks = int(request.form["num_of_networks"])
+            networks = []
+
+            for i in range(num_of_networks):
+                network = Network(ip, mask)
+                print()
+                print(f"Network #{i}:")
+                networks.append(network)
+                ip = network.next(mask.total)
+
+            return render_template(
+                "network-info-result.html",
+                title = "Get network information",
+                getBroadcastAddr = getBroadcastAddr,
+                getAltInterval = getAltInterval,
+                getFirstUsable = getFirstUsable,
+                getLastUsable = getLastUsable,
+                networks = networks
+            )
+
+        except ValueError as e:
+            return render_template("error.html", desc=e)
+
+    else:
+        return render_template("design-a-network-clsm.html")
 
 
 @app.route("/design-a-network-vlsm")
@@ -361,35 +401,6 @@ def oldMain()-> int:
 
         if selection == 99:
             break
-
-        elif selection == 5:
-            try:
-                ip = IPAddress(input("Enter IP address: "))
-                mask = SubnetMask(input("Enter subnet mask (prefix with `/` for CIDR): "))
-                network = Network(ip, mask)
-
-                printNetworkInfo(ip, mask, network)
-
-            except ValueError as e:
-                print(e)
-                print()
-
-
-        elif selection == 6:
-            try:
-                ip = IPAddress(input("Enter the first network's IP address: "))
-                mask = SubnetMask(input("Enter the first network's subnet mask (prefix with `/` for CIDR): "))
-                num_of_networks = int(input("Enter how many networks to make: "))
-
-                for i in range(num_of_networks):
-                    network = Network(ip, mask)
-                    print()
-                    print(f"Network #{i}:")
-                    printNetworkInfo(ip, mask, network)
-                    ip = network.next(mask.total)
-
-            except ValueError as e:
-                print(e)
 
         elif selection == 7:
             try:
@@ -441,7 +452,7 @@ def oldMain()-> int:
                 for idx, network in enumerate(networks):
                     print()
                     print(f"Network #{idx}:")
-                    printNetworkInfo(network.network_address, network.subnet_mask, network)
+                    exportNetworkToHTML(network.network_address, network.subnet_mask, network)
 
             except ValueError as e:
                 raise e
