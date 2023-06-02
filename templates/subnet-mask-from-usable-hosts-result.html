@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>Get subnet mask from number of usable hosts</h2>
+        <p>{{ desc }}</p>
+        <table>
+            <tr>
+                <th><b>Decimal</b></th>
+                <td>{{ mask.decimal }}</td>
+            </tr>
+            <tr>
+                <th><b>Binary</b></th>
+                <td>{{ mask.binary }}</td>
+            </tr>
+            <tr>
+                <th><b>CIDR</b></th>
+                <td>/{{ mask.cidr }}</td>
+            </tr>
+        </table>
+        <a href="{{ url_for('indexPage') }}">Back to home</a>
+    </body>
+</html>

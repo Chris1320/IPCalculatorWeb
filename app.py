@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 
 
 class IPAddress:
@@ -289,9 +289,36 @@ def subnetMaskCalculator() -> str:
         return render_template("subnet-mask-calculator.html")
 
 
-@app.route("/subnet-mask-from-usable-hosts")
+@app.route("/subnet-mask-from-usable-hosts", methods = ["GET", "POST"])
 def subnetMaskFromUsableHosts() -> str:
-    return "Subnet Mask from Usable Hosts"
+    if request.method == "POST":
+        try:
+            hosts = int(request.form["hosts"])
+            use_total = "use_total" in request.form
+            mask = getMaskFromNeededHosts(hosts, use_total)
+            if mask is None:
+                return render_template("error.html", desc="No subnet mask can fit that many hosts.")
+
+            else:
+                if use_total:
+                    return render_template(
+                        "subnet-mask-from-usable-hosts-result.html",
+                        desc = f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses.",
+                        mask = mask
+                    )
+
+                else:
+                    return render_template(
+                        "subnet-mask-from-usable-hosts-result.html",
+                        desc = f"This subnet mask can fit {mask.usable} hosts.",
+                        mask = mask
+                    )
+
+        except ValueError as e:
+            return render_template("error.html", desc = e)
+
+    else:
+        return render_template("subnet-mask-from-usable-hosts.html")
 
 
 @app.route("/subnet-mask-from-total-hosts")
@@ -334,45 +361,6 @@ def oldMain()-> int:
 
         if selection == 99:
             break
-
-        elif selection == 2:
-            try:
-                mask = SubnetMask(input("Enter subnet mask (prefix with `/` for CIDR): "))
-                print()
-                print(f"Decimal: {mask.decimal}")
-                print(f"Binary:  {mask.binary}")
-                print(f"CIDR:    /{mask.cidr}")
-
-            except ValueError as e:
-                print(e)
-                print()
-
-        elif selection in (3, 4):
-            use_total = True if selection == 4 else False
-            try:
-                hosts = int(input("Enter number of hosts needed: "))
-                mask = getMaskFromNeededHosts(hosts, use_total)
-                if mask is None:
-                    print()
-                    print("No subnet mask can fit that many hosts.")
-
-                else:
-                    print()
-                    if use_total:
-                        print(f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses:")
-
-                    else:
-                        print(f"This subnet mask can fit {mask.usable} hosts:")
-
-                    print()
-                    print(f"Decimal: {mask.decimal}")
-                    print(f"Binary:  {mask.binary}")
-                    print(f"CIDR:    /{mask.cidr}")
-
-            except ValueError:
-                print()
-                print("Invalid number of hosts.")
-                print()
 
         elif selection == 5:
             try:

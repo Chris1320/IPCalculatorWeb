@@ -8,10 +8,12 @@
     </head>
     <body>
         <h1>IP Address Calculator</h1>
-        <h2>IP address conversion</h2>
-        <form action="{{ url_for('ipAddressCalculator') }}" method="POST">
-            <label for="ipAddress">IP address:</label>
-            <input type="text" id="ipAddress" name="ipAddress" placeholder=""/>
+        <h2>Get subnet mask from number of usable hosts</h2>
+        <form action="{{ url_for('subnetMaskFromUsableHosts') }}" method="POST">
+            <label for="hosts">Enter number of hosts needed: </label>
+            <input type="text" id="hosts" name="hosts" placeholder=""/><br/>
+            <label for="use_total">Include network and broadcast address</label>
+            <input type="checkbox" id="use_total" name="use_total"><br/>
             <input type="submit" value="Convert">
         </form>
         <a href="{{ url_for('indexPage') }}">Back to home</a>
