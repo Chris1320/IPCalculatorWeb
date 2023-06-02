@@ -258,19 +258,35 @@ def indexPage() -> str:
 @app.route("/ip-address-calculator", methods = ["GET", "POST"])
 def ipAddressCalculator() -> str:
     if request.method == "POST":
-        ip = IPAddress(request.form["ipAddress"])
-        return render_template(
-            "ip-address-calculator-result.html",
-            ip = ip
-        )
+        try:
+            ip = IPAddress(request.form["ipAddress"])
+            return render_template(
+                "ip-address-calculator-result.html",
+                ip = ip
+            )
+
+        except ValueError as e:
+            return render_template("error.html", desc = e)
 
     else:
         return render_template("ip-address-calculator.html")
 
 
-@app.route("/subnet-mask-calculator")
+@app.route("/subnet-mask-calculator", methods = ["GET", "POST"])
 def subnetMaskCalculator() -> str:
-    return "Subnet Mask Calculator"
+    if request.method == "POST":
+        try:
+            mask = SubnetMask(request.form["mask"])
+            return render_template(
+                "subnet-mask-calculator-result.html",
+                mask = mask
+            )
+
+        except ValueError as e:
+            return render_template("error.html", desc = e)
+
+    else:
+        return render_template("subnet-mask-calculator.html")
 
 
 @app.route("/subnet-mask-from-usable-hosts")

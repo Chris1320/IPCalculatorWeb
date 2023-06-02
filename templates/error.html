@@ -8,19 +8,8 @@
     </head>
     <body>
         <h1>IP Address Calculator</h1>
-        <h2>IP address conversion</h2>
-        <table>
-            <tbody>
-                <tr>
-                    <td><b>Decimal</b></td>
-                    <td>{{ ip.decimal }}</td>
-                </tr>
-                <tr>
-                    <td><b>Binary</b></td>
-                    <td>{{ ip.binary }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <h2>Oh no! An error occured.</h2>
+        <p>{{ desc }}</p>
         <a href="{{ url_for('indexPage') }}">Back to home</a>
     </body>
 </html>

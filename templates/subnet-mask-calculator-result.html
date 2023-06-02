@@ -8,18 +8,20 @@
     </head>
     <body>
         <h1>IP Address Calculator</h1>
-        <h2>IP address conversion</h2>
+        <h2>Subnet mask conversion</h2>
         <table>
-            <tbody>
-                <tr>
-                    <td><b>Decimal</b></td>
-                    <td>{{ ip.decimal }}</td>
-                </tr>
-                <tr>
-                    <td><b>Binary</b></td>
-                    <td>{{ ip.binary }}</td>
-                </tr>
-            </tbody>
+            <tr>
+                <th><b>Decimal</b></th>
+                <td>{{ mask.decimal }}</td>
+            </tr>
+            <tr>
+                <th><b>Binary</b></th>
+                <td>{{ mask.binary }}</td>
+            </tr>
+            <tr>
+                <th><b>CIDR</b></th>
+                <td>/{{ mask.cidr }}</td>
+            </tr>
         </table>
         <a href="{{ url_for('indexPage') }}">Back to home</a>
     </body>
