@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>IP address conversion</h2>
+        <table>
+            <thead>
+                <td>Representation</td>
+                <td>Value</td>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Decimal</td>
+                    <td>{{ ip.decimal }}</td>
+                </tr>
+                <tr>
+                    <td>Binary</td>
+                    <td>{{ ip.binary }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <a href="{{ url_for('indexPage') }}">Back to home</a>
+    </body>
+</html>

@@ -251,14 +251,21 @@ app = Flask(__name__)
 @app.route("/")
 def indexPage() -> str:
     return render_template(
-        "index.html",
-        title = "IP Calculator"
+        "index.html"
     )
 
 
-@app.route("/ip-address-calculator")
+@app.route("/ip-address-calculator", methods = ["GET", "POST"])
 def ipAddressCalculator() -> str:
-    return "IP Address Calculator"
+    if request.method == "POST":
+        ip = IPAddress(request.form["ipAddress"])
+        return render_template(
+            "ip-address-calculator-result.html",
+            ip = ip
+        )
+
+    else:
+        return render_template("ip-address-calculator.html")
 
 
 @app.route("/subnet-mask-calculator")
@@ -292,7 +299,7 @@ def designANetworkVLSM() -> str:
 
 
 def main():
-    app.run()
+    app.run(debug=True)
 
 def oldMain()-> int:
     while True:
@@ -311,18 +318,6 @@ def oldMain()-> int:
 
         if selection == 99:
             break
-
-        elif selection == 1:
-            try:
-                ip = IPAddress(input("Enter IP address: "))
-                print()
-                print(f"Decimal: {ip.decimal}")
-                print(f"Binary:  {ip.binary}")
-                print()
-
-            except ValueError as e:
-                print(e)
-                print()
 
         elif selection == 2:
             try:
