@@ -250,7 +250,45 @@ app = Flask(__name__)
 
 @app.route("/")
 def indexPage() -> str:
-    return render_template("index.html")
+    return render_template(
+        "index.html",
+        title = "IP Calculator"
+    )
+
+
+@app.route("/ip-address-calculator")
+def ipAddressCalculator() -> str:
+    return "IP Address Calculator"
+
+
+@app.route("/subnet-mask-calculator")
+def subnetMaskCalculator() -> str:
+    return "Subnet Mask Calculator"
+
+
+@app.route("/subnet-mask-from-usable-hosts")
+def subnetMaskFromUsableHosts() -> str:
+    return "Subnet Mask from Usable Hosts"
+
+
+@app.route("/subnet-mask-from-total-hosts")
+def subnetMaskFromTotalHosts() -> str:
+    return "Subnet Mask from Total Hosts"
+
+
+@app.route("/network-info")
+def networkInfo() -> str:
+    return "Network Info"
+
+
+@app.route("/design-a-network-clsm")
+def designANetworkCLSM() -> str:
+    return "Design a Network (CLSM)"
+
+
+@app.route("/design-a-network-vlsm")
+def designANetworkVLSM() -> str:
+    return "Design a Network (VLSM)"
 
 
 def main():
@@ -261,13 +299,6 @@ def oldMain()-> int:
         print('=' * 40)
         print("What do you want to do?")
         print()
-        print("[01] IP address conversion")
-        print("[02] Subnet mask conversion")
-        print("[03] Get subnet mask from number of usable hosts")
-        print("[04] Get subnet mask from number of total hosts")
-        print("[05] Get single network information")
-        print("[06] Design a network! (Constant subnet mask)")
-        print("[07] Design a network! (VLSM)")
         print()
         print("[99] Exit")
         print()

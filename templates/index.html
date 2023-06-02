@@ -1,0 +1,21 @@
+<<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>{{ title }}</h1>
+        <ol>
+            <li><a href="{{ url_for('ipAddressCalculator') }}">IP address conversion</a></li>
+            <li><a href="{{ url_for('subnetMaskCalculator') }}">Subnet mask conversion</a></li>
+            <li><a href="{{ url_for('subnetMaskFromUsableHosts') }}">Get subnet mask from number of usable hosts</a></li>
+            <li><a href="{{ url_for('subnetMaskFromTotalHosts') }}">Get subnet mask from number of total hosts</a></li>
+            <li><a href="{{ url_for('networkInfo') }}">Get single network information</a></li>
+            <li><a href="{{ url_for('designANetworkCLSM') }}">Design a network! (Constant subnet mask)</a></li>
+            <li><a href="{{ url_for('designANetworkVLSM') }}">Design a network! (VLSM)</a></li>
+        <ol>
+    </body>
+</html>
