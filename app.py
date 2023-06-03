@@ -261,7 +261,7 @@ def ipAddressCalculator() -> str:
                 ip = ip
             )
 
-        except ValueError as e:
+        except Exception as e:
             return render_template("error.html", desc = e)
 
     else:
@@ -278,7 +278,7 @@ def subnetMaskCalculator() -> str:
                 mask = mask
             )
 
-        except ValueError as e:
+        except Exception as e:
             return render_template("error.html", desc = e)
 
     else:
@@ -310,7 +310,7 @@ def subnetMaskFromUsableHosts() -> str:
                         mask = mask
                     )
 
-        except ValueError as e:
+        except Exception as e:
             return render_template("error.html", desc = e)
 
     else:
@@ -336,7 +336,7 @@ def networkInfo() -> str:
                 networks = (network,)
             )
 
-        except ValueError as e:
+        except Exception as e:
             return render_template("error.html", desc=e)
 
     else:
@@ -369,95 +369,84 @@ def designANetworkCLSM() -> str:
                 networks = networks
             )
 
-        except ValueError as e:
+        except Exception as e:
             return render_template("error.html", desc=e)
 
     else:
         return render_template("design-a-network-clsm.html")
 
 
-@app.route("/design-a-network-vlsm")
+@app.route("/design-a-network-vlsm", methods=["GET", "POST"])
 def designANetworkVLSM() -> str:
-    return "Design a Network (VLSM)"
+    if request.method == "POST":
+        try:
+            first_network_address = IPAddress(request.form["ipAddress"])
+            network_quantity = int(request.form["networks"])
+            network_masks = []
+            for i in range(network_quantity):
+                while True:
+                    try:
+                        mask = request.form[f"mask{i}"]
+                        if mask.endswith('h'):
+                            # hosts = int(mask[:-1])
+                            mask = getMaskFromNeededHosts(int(mask[:-1]), False)
+                            if mask is None:
+                                return render_template("error.html", desc="No subnet mask can fit that many hosts.")
+
+                            # print(f"[i] Using /{mask.cidr} as the subnet mask for {hosts} hosts.")
+
+                        else:
+                            mask = SubnetMask(mask)
+
+                        network_masks.append(mask)
+                        break  # break the inner while loop
+
+                    except ValueError as e:
+                        return render_template("error.html", desc=e)
+
+            # sort network_masks by number of hosts
+            network_masks.sort(key=lambda x: x.usable, reverse=True)
+
+            networks: list[Network] = []
+            for _, mask in enumerate(network_masks):
+                networks.append(Network(first_network_address, mask))
+                first_network_address = networks[-1].next(mask.total)
+
+            return render_template(
+                "network-info-result.html",
+                title = "Get network information",
+                getBroadcastAddr = getBroadcastAddr,
+                getAltInterval = getAltInterval,
+                getFirstUsable = getFirstUsable,
+                getLastUsable = getLastUsable,
+                networks = networks
+            )
+
+        except Exception as e:
+            return render_template("error.html", desc=e)
+
+    else:
+        return render_template("design-a-network-vlsm.html")
+
+@app.route("/design-a-network-vlsm-2", methods=["POST"])
+def designANetworkVLSM2() -> str:
+    try:
+        return render_template("design-a-network-vlsm2.html", n = int(request.form.get("num_of_networks", 1)))
+
+    except ValueError:
+        return render_template("error.html", desc="Please enter a valid number.")
+
+    except Exception as e:
+        return render_template("error.html", desc=e)
+
+
+@app.route("/ipv6-calculator", methods=["GET", "POST"])
+def IPv6Calculator():
+    return render_template("error.html", desc="Oh no! The developer lost all his brain cells trying to understand this thing.")
 
 
 def main():
-    app.run(debug=True)
-
-def oldMain()-> int:
-    while True:
-        print('=' * 40)
-        print("What do you want to do?")
-        print()
-        print()
-        print("[99] Exit")
-        print()
-        try:
-            selection = int(input("Enter your selection: "))
-
-        except ValueError:
-            print("Invalid selection.")
-            continue
-
-        if selection == 99:
-            break
-
-        elif selection == 7:
-            try:
-                network_quantity = int(input("Enter how many networks to make: "))
-                network_masks = []
-                networks: list[Network] = []
-
-                first_network_address = IPAddress(input("Enter the first network's IP address: "))
-
-                print("Enter each network's information below:")
-                print("    - enter a subnet mask, CIDR, or number of hosts")
-                print("    - to enter a CIDR, prefix it with `/`")
-                print("    - to enter a number of hosts, postfix it with `h`")
-                for i in range(network_quantity):
-                    while True:
-                        try:
-                            mask = input(f"Network #{i}: ")
-                            if mask.endswith('h'):
-                                hosts = int(mask[:-1])
-                                mask = getMaskFromNeededHosts(int(mask[:-1]), False)
-                                if mask is None:
-                                    raise ValueError("No subnet mask can fit that many hosts.")
-
-                                print(f"[i] Using /{mask.cidr} as the subnet mask for {hosts} hosts.")
-
-                            else:
-                                mask = SubnetMask(mask)
-
-                            network_masks.append(mask)
-                            break  # break the inner while loop
-
-                        except ValueError as e:
-                            print(e)
-                            continue
-
-                # sort network_masks by number of hosts
-                network_masks.sort(key=lambda x: x.usable, reverse=True)
-
-                print()
-                print("Re-arranged network information:")
-                for subnet in network_masks:
-                    print(f"    - {subnet.decimal} (/{subnet.cidr}) {subnet.usable} hosts")
-
-                for _, mask in enumerate(network_masks):
-                    networks.append(Network(first_network_address, mask))
-                    first_network_address = networks[-1].next(mask.total)
-
-                print()
-                for idx, network in enumerate(networks):
-                    print()
-                    print(f"Network #{idx}:")
-                    exportNetworkToHTML(network.network_address, network.subnet_mask, network)
-
-            except ValueError as e:
-                raise e
-
-    return 0
+    app.run()
 
 
 if __name__ == "__main__":

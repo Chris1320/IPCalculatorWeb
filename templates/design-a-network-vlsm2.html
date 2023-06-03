@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>Design a network! (Variable length subnet mask)</h2>
+        <form action="{{ url_for('designANetworkVLSM') }}" method="POST">
+            <label for="ipAddress">Enter the first network's IP address</label>
+            <input type="text" name="ipAddress" id="ipAddress" placeholder="" required><br/>
+            <p>Enter each network's information below:</p>
+            <ul>
+                <li>enter a subnet mask, CIDR, or number of hosts</li>
+                <li>to enter a CIDR, prefix it with `/`</li>
+                <li>to enter a number of hosts, postfix it with `h`</li>
+            </ul>
+            {% for i in range(n) %}
+                <label for="mask{{ i }}">Network #{{ i }} mask</label>
+                <input type="text" name="mask{{ i }}" id="mask{{ i }}" placeholder="" required><br/>
+            {% endfor %}
+            <input type="hidden" name="networks" id="networks" value="{{ n }}">
+            <input type="submit" value="Create">
+        </form>
+        <footer>
+            <hr/>
+            <p><sub><sup>Made in two hours, i can't design this crap.</sup></sub></p>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
+    </body>
+</html>

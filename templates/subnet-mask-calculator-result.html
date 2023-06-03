@@ -4,7 +4,7 @@
         <title>IP Address Calculator</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="css/style.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
     </head>
     <body>
         <h1>IP Address Calculator</h1>
@@ -23,6 +23,13 @@
                 <td>/{{ mask.cidr }}</td>
             </tr>
         </table>
-        <a href="{{ url_for('indexPage') }}">Back to home</a>
+        <footer>
+            <hr/>
+            <p><sub><sup>Made in two hours, i can't design this crap.</sup></sub></p>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
     </body>
 </html>
