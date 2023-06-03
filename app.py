@@ -9,7 +9,8 @@ from flask import render_template
 
 
 # get SECRET_KEY or generate a secure 32-character long secret key.
-SECRET_KEY: Final[str] = os.getenv("SECRET_KEY", os.urandom(32).hex())
+SECRET_KEY: Final[str] = os.getenv("APP_SECRET_KEY", os.urandom(32).hex())
+CWD: str = os.getenv("APP_CWD", os.getcwd())
 
 
 class IPAddress:
@@ -255,7 +256,7 @@ def getCommitHash() -> str:
     try:
         commit_hash: str = subprocess.check_output(
             ['git', 'rev-parse', '--short', 'HEAD'],
-            cwd = os.path.dirname(os.path.realpath(__file__))
+            cwd = CWD
         ).decode('utf-8').strip()
         return f"Site Version: {commit_hash}"
 
@@ -279,7 +280,7 @@ def hooksGitPull():
     try:
         subprocess.run(
             ["git", "pull"],
-            cwd = os.path.dirname(os.path.realpath(__file__))
+            cwd = CWD
         )
         return "OK"
 
