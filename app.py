@@ -1,6 +1,15 @@
+import os
 import sys
+import subprocess
+from typing import Final
 
-from flask import Flask, render_template, request
+from flask import Flask
+from flask import request
+from flask import render_template
+
+
+# get SECRET_KEY or generate a secure 32-character long secret key.
+SECRET_KEY: Final[str] = os.getenv("SECRET_KEY", os.urandom(32).hex())
 
 
 class IPAddress:
@@ -241,14 +250,34 @@ def getLastUsable(network):
     except ValueError as e:
         return e
 
+
+def getCommitHash() -> str:
+    try:
+        return f"Site Version: {subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()}"
+
+    except Exception:
+        return ""
+
+
 app = Flask(__name__)
 
 
 @app.route("/")
 def indexPage() -> str:
     return render_template(
-        "index.html"
+        "index.html",
+        commit_hash = getCommitHash()
     )
+
+
+@app.route("/admin/hooks/git-pull", methods=["POST"])
+def hooksGitPull():
+    try:
+        subprocess.run(["git", "pull"])
+        return "OK"
+
+    except Exception as e:
+        return f"ERROR: {e}"
 
 
 @app.route("/ip-address-calculator", methods = ["GET", "POST"])
