@@ -253,7 +253,11 @@ def getLastUsable(network):
 
 def getCommitHash() -> str:
     try:
-        return f"Site Version: {subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()}"
+        commit_hash: str = subprocess.check_output(
+            ['git', 'rev-parse', '--short', 'HEAD'],
+            cwd = os.path.dirname(os.path.realpath(__file__))
+        ).decode('utf-8').strip()
+        return f"Site Version: {commit_hash}"
 
     except Exception:
         return ""
@@ -273,7 +277,10 @@ def indexPage() -> str:
 @app.route("/admin/hooks/git-pull", methods=["POST"])
 def hooksGitPull():
     try:
-        subprocess.run(["git", "pull"])
+        subprocess.run(
+            ["git", "pull"],
+            cwd = os.path.dirname(os.path.realpath(__file__))
+        )
         return "OK"
 
     except Exception as e:
