@@ -121,6 +121,20 @@ class SubnetMask(IPAddress):
 
         return self.total - 2
 
+    @property
+    def interval(self) -> int:
+        """
+        Get the interval of the subnet mask.
+        """
+
+        octets = self.decimal.split('.')[::-1]
+
+        for octet in octets:
+            if int(octet) != 0:
+                return 256 - int(octet)
+
+        return 0
+
     @staticmethod
     def _maskToCIDR(mask: str) -> int:
         return SubnetMask._toBinary(mask).count('1')
@@ -231,24 +245,24 @@ def getMaskFromNeededHosts(hosts: int, use_total: bool = False) -> SubnetMask | 
     return None
 
 
-def getBroadcastAddr(network):
+def getBroadcastAddr(network: Network):
     try:
         return network.broadcast_address.decimal
 
     except ValueError as e:
         return e
 
-def getAltInterval(network):
-    return 'or 1' if network.subnet_mask.total == 256 else ''
+def getAltInterval(network: Network):
+    return 'or 1' if network.subnet_mask.interval == 256 else ''
 
-def getFirstUsable(network):
+def getFirstUsable(network: Network):
     try:
         return network.first_and_last_usable[0].decimal
 
     except ValueError as e:
         return e
 
-def getLastUsable(network):
+def getLastUsable(network: Network):
     try:
         return network.first_and_last_usable[1].decimal
 
