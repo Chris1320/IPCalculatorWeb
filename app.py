@@ -1,5 +1,7 @@
 import os
 import sys
+import hmac
+import hashlib
 import subprocess
 from typing import Final
 
@@ -8,7 +10,6 @@ from flask import request
 from flask import render_template
 
 
-# get SECRET_KEY or generate a secure 32-character long secret key.
 SECRET_KEY: Final[str] = os.getenv("APP_SECRET_KEY", os.urandom(32).hex())
 CWD: str = os.getenv("APP_CWD", os.getcwd())
 
@@ -277,15 +278,35 @@ def indexPage() -> str:
 
 @app.route("/admin/hooks/git-pull", methods=["POST"])
 def hooksGitPull():
-    try:
-        subprocess.run(
-            ["git", "pull"],
-            cwd = CWD
-        )
-        return "OK"
+    def isValidSignature(x_hub_signature, data, private_key):
+        hash_algorithm, github_signature = x_hub_signature.split('=', 1)
+        algorithm = hashlib.__dict__.get(hash_algorithm)
+        encoded_key = bytes(private_key, 'latin-1')
+        mac = hmac.new(encoded_key, msg=data, digestmod=algorithm)  # type: ignore
 
-    except Exception as e:
-        return f"ERROR: {e}"
+        return hmac.compare_digest(mac.hexdigest(), github_signature)
+
+    print("[i] Received git pull request")
+    if isValidSignature(
+        request.headers.get("X-Hub-Signature"),
+        request.data,
+        SECRET_KEY
+    ):
+        print("[i] Valid signature")
+        try:
+            subprocess.run(
+                ["git", "pull"],
+                cwd = CWD
+            )
+            print(f"[i] Updated to {getCommitHash()}")
+            return "OK"
+
+        except Exception as e:
+            return f"ERROR: {e}"
+
+    else:
+        print("[!] Invalid signature")
+        return "ERROR: Invalid Signature"
 
 
 @app.route("/ip-address-calculator", methods = ["GET", "POST"])
