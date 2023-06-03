@@ -9,10 +9,8 @@ from flask import Flask
 from flask import request
 from flask import render_template
 
-with open("app.conf", 'r') as f:
-    data = f.read().split('\n')
-    SECRET_KEY: Final[str] = data[0]
-    CWD: str = data[1]
+SECRET_KEY: Final[str] = os.getenv("SECRET_KEY", os.urandom(32).hex())
+CWD: str = os.getenv("APP_CWD", os.getcwd())
 
 
 class IPAddress:
