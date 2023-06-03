@@ -23,6 +23,12 @@
                 <td>/{{ mask.cidr }}</td>
             </tr>
         </table>
+        <h3>What are CIDR and subnet masks?</h3>
+        <p>CIDR stands for <i>Classless Inter-Domain Routing</i>. It is a method for allocating IP addresses and routing Internet Protocol packets. It is a replacement for the previous classful network architecture, which used the classes <code>A</code>, <code>B</code>, and <code>C</code> to define networks based on their size.</p>
+        <h3>How to calculate the CIDR of a subnet mask?</h3>
+        <p>To calculate the CIDR of a subnet mask, count the number of <code>1</code> bits in the subnet mask. For example, when the subnet mask <code>255.255.255.224</code> is converted into binary, is <code>11111111.11111111.11111111.11100000</code>. There are 27 <code>1</code> bits, and therefore the CIDR is <code>/27</code>.
+        <h3>How to calculate the subnet mask of a CIDR?</h3>
+        <p>As stated above, you can get the CIDR by counting the <code>1</code> bits of the subnet mask. With this logic, you can get the subnet mask by setting the bits to <code>1</code> from left to right, and then converting each octet into its decimal form.</p>
         <footer>
             <hr/>
             <ul>
