@@ -9,7 +9,7 @@
     </head>
     <body>
         <h1>IP Address Calculator</h1>
-        <h2{{ title }}</h2>
+        <h2>{{ title }}</h2>
         {% for network in networks %}
             <div class="net">
                 <h3><span class="material-icons md-18">assessment</span> Information about {{ network.network_address.decimal }}/{{ network.subnet_mask.cidr }}</h3>
