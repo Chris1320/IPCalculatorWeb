@@ -11,6 +11,7 @@ from flask_limiter.util import get_remote_address
 
 SECRET_KEY: Final[str] = os.getenv("SECRET_KEY", os.urandom(16).hex())
 CWD: str = os.getenv("APP_CWD", os.getcwd())
+DEBUG: bool = True if os.getenv("DEBUG_MODE", '').lower() == "true" else False
 
 
 print(f"{SECRET_KEY=}")
@@ -511,7 +512,7 @@ def IPv6Calculator():
 
 
 def main():
-    app.run()
+    app.run(debug=DEBUG)
 
 
 if __name__ == "__main__":

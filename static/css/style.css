@@ -26,6 +26,19 @@ html, body{
 body{
 	background:#111111;
 }
+
+.material-icons.md-14 {
+    font-size: 14px;
+}
+
+.net {
+    margin: 0 auto;
+}
+
+.net-info {
+    margin-left: 50px;
+}
+
 a{
 	text-decoration:none;
 	color:#999999;

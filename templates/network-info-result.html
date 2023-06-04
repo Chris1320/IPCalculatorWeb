@@ -5,48 +5,51 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
         <h1>IP Address Calculator</h1>
         <h2{{ title }}</h2>
         {% for network in networks %}
-            <div>
-                <h3>Information about {{ network.network_address.decimal }}/{{ network.subnet_mask.cidr }}</h3>
-                <table>
-                    <tr>
-                        <td>Network address</td>
-                        <td>{{ network.network_address.decimal }}</td>
-                    </tr>
-                    <tr>
-                        <td>Subnet mask</td>
-                    <td>{{ network.subnet_mask.decimal }} (/{{ network.subnet_mask.cidr }})</td>
-                    </tr>
-                    <tr>
-                        <td>Broadcast address</td>
-                        <td>{{ getBroadcastAddr(network) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Interval</td>
-                    <td>{{ network.subnet_mask.interval }} {{ getAltInterval(network) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Usable addresses</td>
-                    <td>{{ network.subnet_mask.usable }} ({{ network.subnet_mask.total }} total addresses)</td>
-                    </tr>
-                    <tr>
-                        <td>First usable address</td>
-                        <td>{{ getFirstUsable(network) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Last usable address</td>
-                        <td>{{ getLastUsable(network) }}</td>
-                    </tr>
-                </table>
+            <div class="net">
+                <h3><span class="material-icons md-18">assessment</span> Information about {{ network.network_address.decimal }}/{{ network.subnet_mask.cidr }}</h3>
+                <div class="net-info">
+                    <table>
+                        <tr>
+                            <td><span class="material-icons md-14">cloud</span> Network address</td>
+                            <td>{{ network.network_address.decimal }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="material-icons md-14">settings_ethernet</span> Subnet mask</td>
+                        <td>{{ network.subnet_mask.decimal }} (/{{ network.subnet_mask.cidr }})</td>
+                        </tr>
+                        <tr>
+                            <td><span class="material-icons md-14">cell_tower</span> Broadcast address</td>
+                            <td>{{ getBroadcastAddr(network) }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="material-icons md-14">loop</span> Interval</td>
+                        <td>{{ network.subnet_mask.interval }} {{ getAltInterval(network) }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="material-icons md-14">people_alt</span> Usable addresses</td>
+                        <td>{{ network.subnet_mask.usable }} ({{ network.subnet_mask.total }} total addresses)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="material-icons md-14">devices</span> First usable address</td>
+                            <td>{{ getFirstUsable(network) }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="material-icons md-14">devices</span> Last usable address</td>
+                            <td>{{ getLastUsable(network) }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <hr/>
             </div>
         {% endfor %}
         <footer>
             <br/><br/><br/><br/>
-            <hr/>
             <ul>
                 <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
                 <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
