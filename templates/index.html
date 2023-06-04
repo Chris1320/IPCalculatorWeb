@@ -11,26 +11,25 @@
         <h1>IP Address Calculator</h1>
         <br/>
         <h2>IPv4 Stuff</h2>
-        <ol>
+        <ul id="index-menu">
             <li><span class="material-icons md-14">public</span> <a href="{{ url_for('ipAddressCalculator') }}">IP address conversion</a></li>
             <li><span class="material-icons md-14">settings_ethernet</span> <a href="{{ url_for('subnetMaskCalculator') }}">Subnet mask conversion</a></li>
             <li><span class="material-icons md-14">group</span> <a href="{{ url_for('subnetMaskFromUsableHosts') }}">Get subnet mask from number of usable/total hosts</a></li>
             <li><span class="material-icons md-14">lan</span> <a href="{{ url_for('networkInfo') }}">Get single network information</a></li>
             <li><span class="material-icons md-14">router</span> <a href="{{ url_for('designANetworkCLSM') }}">Design a network! (Constant subnet mask)</a></li>
             <li><span class="material-icons md-14">router</span> <a href="{{ url_for('designANetworkVLSM') }}">Design a network! (VLSM)</a></li>
-        </ol>
+        </ul>
         <br/>
         <h2>IPv6 Stuff</h2>
-        <ol>
+        <ul id="index-menu">
             <li><span class="material-icons md-14">public</span> <a href="{{ url_for('IPv6Calculator') }}">IP address conversion</a></li>
-        </ol>
+        </ul>
         <footer>
             <br/><br/><br/><br/>
             <hr/>
-            <p>{{ commit_hash }}</p>
-            <ul>
-                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
-            </ul>
+            <p id="footer-info">{{ commit_hash }}</p>
+            <a id="footer-info" href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a>
+            <br/>
         </footer>
     </body>
 </html>

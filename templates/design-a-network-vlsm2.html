@@ -10,20 +10,33 @@
         <h1>IP Address Calculator</h1>
         <h2>Design a network! (Variable length subnet mask)</h2>
         <form action="{{ url_for('designANetworkVLSM') }}" method="POST">
-            <label for="ipAddress">Enter the first network's IP address</label>
-            <input type="text" name="ipAddress" id="ipAddress" placeholder="" required><br/>
-            <p>Enter each network's information below:</p>
-            <ul>
-                <li>enter a subnet mask, CIDR, or number of hosts</li>
-                <li>to enter a CIDR, prefix it with `/`</li>
-                <li>to enter a number of hosts, postfix it with `h`</li>
-            </ul>
+            <table style="width: 40%;">
+                <tr>
+                    <td><label for="ipAddress">Enter the first network's IP address</label></td>
+                    <td><input type="text" name="ipAddress" id="ipAddress" placeholder="" required></td>
+                </tr>
+            </table>
+            <div class="border" id="indent" style="width: 30%; margin-top: 18px; margin-bottom: 18px;">
+                <p>Enter each network's information below:</p>
+                <ul>
+                    <li>enter a subnet mask, CIDR, or number of hosts</li>
+                    <li>to enter a CIDR, prefix it with `/`</li>
+                    <li>to enter a number of hosts, postfix it with `h`</li>
+                </ul>
+            </div>
+            <table style="width: 30%;">
             {% for i in range(n) %}
-                <label for="mask{{ i }}">Network #{{ i }} mask</label>
-                <input type="text" name="mask{{ i }}" id="mask{{ i }}" placeholder="" required><br/>
+                <tr>
+                    <td><label for="mask{{ i }}">Network #{{ i }} mask</label></td>
+                    <td><input type="text" name="mask{{ i }}" id="mask{{ i }}" placeholder="" required></td>
+                </tr>
             {% endfor %}
-            <input type="hidden" name="networks" id="networks" value="{{ n }}">
-            <input type="submit" value="Create">
+                <tr>
+                    <td></td>
+                    <td><input class="button" type="submit" value="Create"></td>
+                </tr>
+                <input type="hidden" name="networks" id="networks" value="{{ n }}">
+            </table>
         </form>
         <footer>
             <br/><br/><br/><br/>

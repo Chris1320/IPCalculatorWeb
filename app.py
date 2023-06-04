@@ -420,8 +420,6 @@ def designANetworkCLSM() -> str:
 
             for i in range(num_of_networks):
                 network = Network(ip, mask)
-                print()
-                print(f"Network #{i}:")
                 networks.append(network)
                 ip = network.next(mask.total)
 
@@ -458,8 +456,6 @@ def designANetworkVLSM() -> str:
                             mask = getMaskFromNeededHosts(int(mask[:-1]), False)
                             if mask is None:
                                 return render_template("error.html", desc="No subnet mask can fit that many hosts.")
-
-                            # print(f"[i] Using /{mask.cidr} as the subnet mask for {hosts} hosts.")
 
                         else:
                             mask = SubnetMask(mask)

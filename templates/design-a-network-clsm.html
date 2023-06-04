@@ -10,13 +10,23 @@
         <h1>IP Address Calculator</h1>
         <h2>Design a network! (Constant subnet mask)</h2>
         <form action="{{ url_for('designANetworkCLSM') }}" method="POST">
-            <label for="ipAddress">IP address</label>
-            <input type="text" name="ipAddress" id="ipAddress" placeholder="" required><br/>
-            <label for="subnetMask">Subnet mask</label>
-            <input type="text" name="subnetMask" id="subnetMask" placeholder="" required><br/>
-            <label for="num_of_networks">Enter how many networks to make</label>
-            <input type="text" name="num_of_networks" id="num_of_networks" placeholder="" required><br/>
-            <input type="submit" value="Convert">
+            <table>
+                <tr>
+                    <td><label for="ipAddress">IP address</label></td>
+                    <td><input type="text" name="ipAddress" id="ipAddress" placeholder="10.0.0.0" required></td>
+                </tr>
+                <tr>
+                    <td><label for="subnetMask">Subnet mask</label></td>
+                    <td><input type="text" name="subnetMask" id="subnetMask" placeholder="255.255.255.0" required></td>
+                </tr>
+                    <td><label for="num_of_networks">Enter how many networks to make</label></td>
+                    <td><input type="text" name="num_of_networks" id="num_of_networks" placeholder="1" required></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" class="button" value="Convert"></td>
+                </tr>
+            </table>
         </form>
         <footer>
             <br/><br/><br/><br/>

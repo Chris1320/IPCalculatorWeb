@@ -10,11 +10,20 @@
         <h1>IP Address Calculator</h1>
         <h2>Get subnet mask from number of usable hosts</h2>
         <form action="{{ url_for('subnetMaskFromUsableHosts') }}" method="POST">
-            <label for="hosts">Enter number of hosts needed: </label>
-            <input type="text" id="hosts" name="hosts" placeholder="" required/><br/>
-            <label for="use_total">Include network and broadcast address</label>
-            <input type="checkbox" id="use_total" name="use_total"><br/>
-            <input type="submit" value="Convert">
+            <table style="width: 35%;">
+                <tr>
+                    <td><label for="hosts">Enter number of hosts needed: </label><br/>
+                    <td><input type="text" id="hosts" name="hosts" placeholder="255" required/><br/>
+                </tr>
+                <tr>
+                    <td><label for="use_total">Include network and broadcast address</label><br/>
+                    <td><input type="checkbox" id="use_total" name="use_total"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Convert"></td>
+                </tr>
+            </table>
         </form>
         <footer>
             <br/><br/><br/><br/>

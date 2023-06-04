@@ -10,9 +10,16 @@
         <h1>IP Address Calculator</h1>
         <h2>Design a network! (Variable length subnet mask)</h2>
         <form action="{{ url_for('designANetworkVLSM2') }}" method="POST">
-            <label for="num_of_networks">Enter how many networks to make</label>
-            <input type="text" name="num_of_networks" id="num_of_networks" placeholder="" required><br/>
-            <input type="submit" value="Next">
+            <table>
+                <tr>
+                    <td><label for="num_of_networks">Enter how many networks to make</label></td>
+                    <td><input type="text" name="num_of_networks" id="num_of_networks" placeholder="" required></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input class="button" type="submit" value="Next"></td>
+                </tr>
+            </table>
         </form>
         <footer>
             <br/><br/><br/><br/>

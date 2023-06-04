@@ -10,11 +10,18 @@
     <body>
         <h1>IP Address Calculator</h1>
         <h2>{{ title }}</h2>
+        <div class="nav">
+            <button class="button" style="text-align: center; float: right;"><a href="#">Share</a></button>
+            <button class="button" style="text-align: center; float: right;"><a href="#">Export</a></button>
+            <button class="button" style="text-align: center; float: left;"><a href="{{ url_for('indexPage') }}">Back to home</a></button>
+            <button class="button" style="text-align: center; float: left;"><a href="https://github.com/Chris1320/IPCalculatorWeb" target="_blank">View on GitHub</a></button>
+        </div>
+        <br/><br/><br/>
         {% for network in networks %}
             <div class="net">
                 <h3><span class="material-icons md-18">assessment</span> Information about {{ network.network_address.decimal }}/{{ network.subnet_mask.cidr }}</h3>
                 <div class="net-info">
-                    <table>
+                    <table class="border">
                         <tr>
                             <td><span class="material-icons md-14">cloud</span> Network address</td>
                             <td>{{ network.network_address.decimal }}</td>
@@ -45,15 +52,8 @@
                         </tr>
                     </table>
                 </div>
-                <hr/>
+                <br/>
             </div>
         {% endfor %}
-        <footer>
-            <br/><br/><br/><br/>
-            <ul>
-                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
-                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
-            </ul>
-        </footer>
     </body>
 </html>
