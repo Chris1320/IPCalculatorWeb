@@ -11,7 +11,7 @@
         <h1>IP Address Calculator</h1>
         <h2>{{ title }}</h2>
         <div class="nav">
-            <a href="{{ share_url }}"><button class="button" style="text-align: center; float: right;">Share</button></a>
+            <button class="button" style="text-align: center; float: right;" onclick="copyShareURLToClipboard()">Share</button>
             <a href="#"><button class="button" style="text-align: center; float: right;">Export</button></a>
             <a href="{{ url_for('indexPage') }}"><button class="button" style="text-align: center; float: left;">Back to home</button></a>
             <a href="https://github.com/Chris1320/IPCalculatorWeb" target="_blank"><button class="button" style="text-align: center; float: left;">View on GitHub</button></a>
@@ -55,5 +55,14 @@
                 <br/>
             </div>
         {% endfor %}
+        <a href="{{ share_url }}" id="share-url" hidden></a>
+        <script>
+            function copyShareURLToClipboard()
+            {
+                var share_url = document.getElementById("share-url").href
+                navigator.clipboard.writeText(share_url)
+                alert("Copied share URL to clipboard!")
+            }
+        </script>
     </body>
 </html>
