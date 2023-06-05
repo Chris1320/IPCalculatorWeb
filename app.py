@@ -12,6 +12,7 @@ from flask import render_template
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+
 SECRET_KEY: Final[str] = os.getenv("SECRET_KEY", os.urandom(16).hex())
 CWD: str = os.getenv("APP_CWD", os.getcwd())
 DEBUG: bool = True if os.getenv("DEBUG_MODE", '').lower() == "true" else False
@@ -55,6 +56,9 @@ class IPAddress:
             return False
 
         for octet in ip:
+            if not octet.isdigit():
+                return False
+
             if not 0 <= int(octet) <= 255:
                 return False
 
@@ -238,17 +242,18 @@ def getMaskFromNeededHosts(hosts: int, use_total: bool = False) -> SubnetMask | 
     # loop from the smallest possible CIDR to the biggest and check if the hosts can fit there.
     if use_total:
         for i in range(32):
-            if (2**i) >= hosts:
+            if (2 ** i) >= hosts:
                 return SubnetMask(f"/{32 - i}")
 
     else:
         for i in range(32):
-            if (2**i) - 2 >= hosts:
+            if (2 ** i) - 2 >= hosts:
                 return SubnetMask(f"/{32 - i}")
 
     return None
 
 
+# Helper functions to be used in jinja templates
 def getBroadcastAddr(network: Network):
     try:
         return network.broadcast_address.decimal
@@ -256,8 +261,10 @@ def getBroadcastAddr(network: Network):
     except ValueError as e:
         return e
 
+
 def getAltInterval(network: Network):
-    return 'or 1' if network.subnet_mask.interval == 256 else ''
+    return "or 1" if network.subnet_mask.interval == 256 else ''
+
 
 def getFirstUsable(network: Network):
     try:
@@ -265,6 +272,7 @@ def getFirstUsable(network: Network):
 
     except ValueError as e:
         return e
+
 
 def getLastUsable(network: Network):
     try:
@@ -274,10 +282,10 @@ def getLastUsable(network: Network):
         return e
 
 
-def renderNetworkInfo(networks: Iterable[Network], title: str, share_url: str) -> str:
+def renderNetworkInfo(networks: Iterable[Network], share_url: str) -> str:
     return render_template(
         "network-info-result.html",
-        title = title,
+        title = "Get network information",
         getBroadcastAddr = getBroadcastAddr,
         getAltInterval = getAltInterval,
         getFirstUsable = getFirstUsable,
@@ -296,20 +304,20 @@ def getCommitHash() -> str:
         return f"Site Version: {commit_hash}"
 
     except Exception:
-        return ""
+        return ''
 
 
 app = Flask(__name__)
 limiter = Limiter(
     get_remote_address,
-    app=app,
-    default_limits=["1 per second"],
-    storage_uri="memory://",
-    strategy="fixed-window"
+    app = app,
+    default_limits = ["1 per second"],
+    storage_uri = "memory://",
+    strategy = "fixed-window"
 )
 
 
-@app.route("/")
+@app.route('/')
 def indexPage() -> str:
     return render_template(
         "index.html",
@@ -379,18 +387,17 @@ def subnetMaskFromUsableHosts() -> str:
 
             else:
                 if use_total:
-                    return render_template(
-                        "subnet-mask-from-usable-hosts-result.html",
-                        desc = f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses.",
-                        mask = mask
-                    )
+                    desc = f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses."
 
                 else:
-                    return render_template(
-                        "subnet-mask-from-usable-hosts-result.html",
-                        desc = f"This subnet mask can fit {mask.usable} hosts.",
-                        mask = mask
-                    )
+                    desc = f"This subnet mask can fit {mask.usable} hosts."
+
+                return render_template(
+                    "subnet-mask-from-usable-hosts-result.html",
+                    desc = desc,
+                    mask = mask
+                )
+
 
         except Exception as e:
             return render_template("error.html", desc = e)
@@ -409,7 +416,6 @@ def networkInfo() -> str:
 
             return renderNetworkInfo(
                 networks = network,
-                title = "Get network information",
                 share_url = url_for("shareNetworkInfo", ip=ip.decimal, mask=mask.decimal)
             )
 
@@ -438,7 +444,6 @@ def shareNetworkInfo():
 
         return renderNetworkInfo(
             networks = network,
-            title = "Get network information",
             share_url = url_for("shareNetworkInfo", ip=ip.decimal, mask=mask.decimal)
         )
 
@@ -455,19 +460,20 @@ def designANetworkCLSM() -> str:
             num_of_networks = int(request.form["num_of_networks"])
             networks = []
 
-            for i in range(num_of_networks):
+            first_ip = ip.decimal  # Get the first IP for the share url
+            for _ in range(num_of_networks):
                 network = Network(ip, mask)
                 networks.append(network)
                 ip = network.next(mask.total)
 
-            return render_template(
-                "network-info-result.html",
-                title = "Get network information",
-                getBroadcastAddr = getBroadcastAddr,
-                getAltInterval = getAltInterval,
-                getFirstUsable = getFirstUsable,
-                getLastUsable = getLastUsable,
-                networks = networks
+            return renderNetworkInfo(
+                networks = networks,
+                share_url = url_for(
+                    "shareDesignANetworkCLSM",
+                    n = num_of_networks,
+                    ip = first_ip,
+                    mask = mask.decimal
+                )
             )
 
         except Exception as e:
@@ -477,19 +483,69 @@ def designANetworkCLSM() -> str:
         return render_template("design-a-network-clsm.html")
 
 
+@app.route("/design-a-network-clsm/share", methods = ["GET"])
+def shareDesignANetworkCLSM():
+    """
+    Requires three GET parameters: n (num_of_networks),ip, and mask
+    """
+
+    try:
+        num_of_networks = request.args.get('n')
+        ip = request.args.get("ip")
+        mask = request.args.get("mask")
+        if num_of_networks is None or ip is None or mask is None:
+            return redirect(url_for("designANetworkCLSM"))
+
+        num_of_networks = int(num_of_networks)
+        ip = IPAddress(ip)
+        mask = SubnetMask(mask)
+
+        first_ip = ip.decimal  # Get the first IP for the share url
+        networks = []
+        for _ in range(num_of_networks):
+            network = Network(ip, mask)
+            networks.append(network)
+            ip = network.next(mask.total)
+
+        return renderNetworkInfo(
+            networks = networks,
+            share_url = url_for(
+                "shareDesignANetworkCLSM",
+                n = num_of_networks,
+                ip = first_ip,
+                mask = mask.decimal
+            )
+        )
+
+    except Exception as e:
+        return render_template("error.html", desc=e)
+
+
 @app.route("/design-a-network-vlsm", methods=["GET", "POST"])
 def designANetworkVLSM() -> str:
     if request.method == "POST":
         try:
-            first_network_address = IPAddress(request.form["ipAddress"])
-            network_quantity = int(request.form["networks"])
-            network_masks = []
-            for i in range(network_quantity):
-                while True:
+            # Check if user finished the first part of the form
+            if request.form.get("networks", None) is None:
+                # This is the first part of the form.
+                try:
+                    return render_template("design-a-network-vlsm2.html", n = int(request.form.get("num_of_networks", 1)))
+
+                except ValueError:
+                    return render_template("error.html", desc="Please enter a valid number.")
+
+                except Exception as e:
+                    return render_template("error.html", desc=e)
+
+            else:
+                # This is the 2nd part of the form.
+                first_network_address = IPAddress(request.form["ipAddress"])
+                network_quantity = int(request.form["networks"])
+                network_masks = []
+                for i in range(network_quantity):
                     try:
                         mask = request.form[f"mask{i}"]
                         if mask.endswith('h'):
-                            # hosts = int(mask[:-1])
                             mask = getMaskFromNeededHosts(int(mask[:-1]), False)
                             if mask is None:
                                 return render_template("error.html", desc="No subnet mask can fit that many hosts.")
@@ -498,28 +554,30 @@ def designANetworkVLSM() -> str:
                             mask = SubnetMask(mask)
 
                         network_masks.append(mask)
-                        break  # break the inner while loop
 
                     except ValueError as e:
                         return render_template("error.html", desc=e)
 
-            # sort network_masks by number of hosts
-            network_masks.sort(key=lambda x: x.usable, reverse=True)
+                # sort network_masks by number of hosts
+                network_masks.sort(key=lambda x: x.usable, reverse=True)
 
-            networks: list[Network] = []
-            for _, mask in enumerate(network_masks):
-                networks.append(Network(first_network_address, mask))
-                first_network_address = networks[-1].next(mask.total)
+                # Save the first network address in
+                # decimal form for sharing the result.
+                first_network_address_share = first_network_address.decimal
+                networks: list[Network] = []
+                for _, mask in enumerate(network_masks):
+                    networks.append(Network(first_network_address, mask))
+                    first_network_address = networks[-1].next(mask.total)
 
-            return render_template(
-                "network-info-result.html",
-                title = "Get network information",
-                getBroadcastAddr = getBroadcastAddr,
-                getAltInterval = getAltInterval,
-                getFirstUsable = getFirstUsable,
-                getLastUsable = getLastUsable,
-                networks = networks
-            )
+                return renderNetworkInfo(
+                    networks = networks,
+                    share_url = url_for(
+                        "shareDesignANetworkVLSM",
+                        first = first_network_address_share,
+                        masks = ','.join([f"/{str(mask.cidr)}" for mask in network_masks]),
+                        n = network_quantity
+                    )
+                )
 
         except Exception as e:
             return render_template("error.html", desc=e)
@@ -527,13 +585,40 @@ def designANetworkVLSM() -> str:
     else:
         return render_template("design-a-network-vlsm.html")
 
-@app.route("/design-a-network-vlsm-2", methods=["POST"])
-def designANetworkVLSM2() -> str:
-    try:
-        return render_template("design-a-network-vlsm2.html", n = int(request.form.get("num_of_networks", 1)))
 
-    except ValueError:
-        return render_template("error.html", desc="Please enter a valid number.")
+@app.route("/design-a-network-vlsm/share", methods=["GET"])
+def shareDesignANetworkVLSM():
+    try:
+        first_network_address = request.args.get("first")
+        network_quantity = request.args.get('n')
+        network_masks = request.args.get("masks")
+        if first_network_address is None or network_quantity is None or network_masks is None:
+            return redirect(url_for("designANetworkVLSM"))
+
+        first_network_address = IPAddress(first_network_address)
+        network_quantity = int(network_quantity)
+        network_masks = [SubnetMask(mask) for mask in network_masks.split(',')]
+
+        # sort network_masks by number of hosts
+        network_masks.sort(key=lambda x: x.usable, reverse=True)
+
+        # Save the first network address in
+        # decimal form for sharing the result.
+        first_network_address_share = first_network_address.decimal
+        networks: list[Network] = []
+        for _, mask in enumerate(network_masks):
+            networks.append(Network(first_network_address, mask))
+            first_network_address = networks[-1].next(mask.total)
+
+        return renderNetworkInfo(
+            networks = networks,
+            share_url = url_for(
+                "shareDesignANetworkVLSM",
+                first = first_network_address_share,
+                masks = ','.join([f"/{str(mask.cidr)}" for mask in network_masks]),
+                n = network_quantity
+            )
+        )
 
     except Exception as e:
         return render_template("error.html", desc=e)
