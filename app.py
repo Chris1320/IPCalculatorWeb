@@ -2,9 +2,12 @@ import os
 import sys
 import subprocess
 from typing import Final
+from typing import Iterable
 
 from flask import Flask
 from flask import request
+from flask import url_for
+from flask import redirect
 from flask import render_template
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -271,6 +274,19 @@ def getLastUsable(network: Network):
         return e
 
 
+def renderNetworkInfo(networks: Iterable[Network], title: str, share_url: str) -> str:
+    return render_template(
+        "network-info-result.html",
+        title = title,
+        getBroadcastAddr = getBroadcastAddr,
+        getAltInterval = getAltInterval,
+        getFirstUsable = getFirstUsable,
+        getLastUsable = getLastUsable,
+        networks = networks,
+        share_url = share_url
+    )
+
+
 def getCommitHash() -> str:
     try:
         commit_hash: str = subprocess.check_output(
@@ -389,17 +405,12 @@ def networkInfo() -> str:
         try:
             ip = IPAddress(request.form["ipAddress"])
             mask = SubnetMask(request.form["subnetMask"])
-            network = Network(ip, mask)
+            network = (Network(ip, mask),)
 
-
-            return render_template(
-                "network-info-result.html",
+            return renderNetworkInfo(
+                networks = network,
                 title = "Get network information",
-                getBroadcastAddr = getBroadcastAddr,
-                getAltInterval = getAltInterval,
-                getFirstUsable = getFirstUsable,
-                getLastUsable = getLastUsable,
-                networks = (network,)
+                share_url = url_for("shareNetworkInfo", ip=ip.decimal, mask=mask.decimal)
             )
 
         except Exception as e:
@@ -407,6 +418,32 @@ def networkInfo() -> str:
 
     else:
         return render_template("network-info.html")
+
+
+@app.route("/network-info/share", methods = ["GET"])
+def shareNetworkInfo():
+    """
+    Requires two GET parameters: ip and mask.
+    """
+
+    try:
+        ip = request.args.get("ip")
+        mask = request.args.get("mask")
+        if ip is None or mask is None:
+            return redirect(url_for("networkInfo"))
+
+        ip = IPAddress(ip)
+        mask = SubnetMask(mask)
+        network = (Network(ip, mask),)
+
+        return renderNetworkInfo(
+            networks = network,
+            title = "Get network information",
+            share_url = url_for("shareNetworkInfo", ip=ip.decimal, mask=mask.decimal)
+        )
+
+    except Exception as e:
+        return render_template("error.html", desc=e)
 
 
 @app.route("/design-a-network-clsm", methods = ["GET", "POST"])
