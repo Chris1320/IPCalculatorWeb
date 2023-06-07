@@ -337,11 +337,87 @@ class IPv6:
     @staticmethod
     def _shortenIP(ip: str) -> str:
         ipv6 = ipaddress.IPv6Address(ip)
-        return ipv6.compressed
+        return ipv6.compressed.upper()
 
     @staticmethod
     def _expandIP(ip: str) -> str:
-        return ipaddress.IPv6Address(ip).exploded
+        return ipaddress.IPv6Address(ip).exploded.upper()
+
+    @staticmethod
+    def _toBinary(hexadecimal_ip: str) -> str:
+        """
+        Convert an IPv6 address to its binary representation.
+        """
+
+        binary = ''
+
+        for hextet in hexadecimal_ip.split(':'):
+            binary += bin(IPv6._toDecimal(hextet))[2:].zfill(16)
+
+        return binary
+
+
+class IPv6SubnetMask(IPv6):
+    def __init__(self, mask_or_cidr: str):
+        if mask_or_cidr.startswith('/'):
+            mask = IPv6SubnetMask._CIDRToMask(int(mask_or_cidr[1:]))
+
+        else:
+            mask = IPv6SubnetMask._expandIP(mask_or_cidr)
+
+        if not IPv6SubnetMask.isValidIP(mask):
+            raise ValueError("Invalid IPv6 subnet mask.")
+
+        self._ip = mask
+
+    @property
+    def cidr(self) -> int:
+        return IPv6SubnetMask._maskToCIDR(self._ip)
+
+    @property
+    def total(self) -> int:
+        return 2 ** (128 - self.cidr)
+
+    @property
+    def interval(self) -> int:
+        hextets = self._ip.split(':')[::-1]
+
+        for hextet in hextets:
+            if IPv6._toDecimal(hextet) != 0:
+                return 65535 - IPv6._toDecimal(hextet)
+
+        return 0
+
+    @staticmethod
+    def _maskToCIDR(mask: str) -> int:
+        """
+        Convert the mask to CIDR notation.
+        """
+
+        return IPv6SubnetMask._toBinary(mask).count('1')
+
+    @staticmethod
+    def _CIDRToMask(cidr: int) -> str:
+        """
+        Convert the CIDR notation to mask.
+        """
+
+        mask = ''
+
+        for i in range(8):
+            if cidr >= 16:
+                mask += 'FFFF'
+
+            else:
+                mask += IPv6._toHexadecimal(2 ** cidr - 1).zfill(4)
+
+            cidr -= 16
+
+            if i != 7:
+                mask += ':'
+
+        return mask
+
 
 # Helper functions to be used in jinja templates
 def getBroadcastAddr(network: Network):
@@ -729,6 +805,23 @@ def ipv6Calculator():
 
     else:
         return render_template("ipv6-calculator.html")
+
+
+@app.route("/ipv6-subnet-mask-calculator", methods=["GET", "POST"])
+def ipv6SubnetMaskCalculator():
+    if request.method == "POST":
+        try:
+            mask = IPv6SubnetMask(request.form["mask"])
+            return render_template(
+                "ipv6-subnet-mask-calculator-result.html",
+                mask = mask
+            )
+
+        except Exception as e:
+            return render_template("error.html", desc = e)
+
+    else:
+        return render_template("ipv6-subnet-mask-calculator.html")
 
 
 def main():

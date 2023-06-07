@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>IPv6 Subnet mask conversion</h2>
+        <table class="border" id="indent">
+            <tr>
+                <td><b>Hexadecimal</b></td>
+                <td>{{ mask.hexadecimal }}</td>
+            </tr>
+            <tr>
+                <td><b>Shortened Form</b></td>
+                <td>{{ mask.short_hex }}</td>
+            </tr>
+            <tr>
+                <td><b>CIDR</b></td>
+                <td>/{{ mask.cidr }}</td>
+            </tr>
+            <tr>
+                <td><b>Capacity</b></td>
+                <td>{{ mask.total }} addresses available</td>
+            </tr>
+        </table>
+        <h3>What are CIDR and subnet masks?</h3>
+        <p style="margin-left: 16px; margin-right: 16px;">CIDR stands for <i>Classless Inter-Domain Routing</i>. It is a method for allocating IP addresses and routing Internet Protocol packets. It is a replacement for the previous classful network architecture, which used the classes <code>A</code>, <code>B</code>, and <code>C</code> to define networks based on their size.</p>
+        <h3>How to calculate the CIDR of a subnet mask?</h3>
+        <p style="margin-left: 16px; margin-right: 16px;">To calculate the CIDR of a subnet mask, count the number of <code>1</code> bits in the subnet mask. For example, when the subnet mask <code>255.255.255.224</code> is converted into binary, is <code>11111111.11111111.11111111.11100000</code>. There are 27 <code>1</code> bits, and therefore the CIDR is <code>/27</code>.
+        <h3>How to calculate the subnet mask of a CIDR?</h3>
+        <p style="margin-left: 16px; margin-right: 16px;">As stated above, you can get the CIDR by counting the <code>1</code> bits of the subnet mask. With this logic, you can get the subnet mask by setting the bits to <code>1</code> from left to right, and then converting each octet into its decimal form.</p>
+        <footer>
+            <br/><br/><br/><br/>
+            <hr/>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
+    </body>
+</html>
