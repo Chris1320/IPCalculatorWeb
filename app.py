@@ -279,12 +279,12 @@ class IPv6:
         quotient = value
         result = ''
         letters = {
-            10: 'A',
-            11: 'B',
-            12: 'C',
-            13: 'D',
-            14: 'E',
-            15: 'F'
+            10: 'a',
+            11: 'b',
+            12: 'c',
+            13: 'd',
+            14: 'e',
+            15: 'f'
         }
 
         while quotient > 0:
@@ -302,19 +302,19 @@ class IPv6:
         """
 
         letters = {
-            'A': 10,
-            'B': 11,
-            'C': 12,
-            'D': 13,
-            'E': 14,
-            'F': 15
+            'a': 10,
+            'b': 11,
+            'c': 12,
+            'd': 13,
+            'e': 14,
+            'f': 15
         }
 
         exponent = 0  # The exponent of the right-most binary digit.
         result = 0
 
         for digit in value[::-1]:
-            digit = letters[digit.upper()] if not digit.isdigit() else digit
+            digit = letters[digit.lower()] if not digit.isdigit() else digit
             result += int(digit) * (16 ** exponent)
 
             exponent += 1  # Get the place value of the next octal digit.
@@ -337,11 +337,11 @@ class IPv6:
     @staticmethod
     def _shortenIP(ip: str) -> str:
         ipv6 = ipaddress.IPv6Address(ip)
-        return ipv6.compressed.upper()
+        return ipv6.compressed.lower()
 
     @staticmethod
     def _expandIP(ip: str) -> str:
-        return ipaddress.IPv6Address(ip).exploded.upper()
+        return ipaddress.IPv6Address(ip).exploded.lower()
 
     @staticmethod
     def _toBinary(hexadecimal_ip: str) -> str:
@@ -406,7 +406,7 @@ class IPv6SubnetMask(IPv6):
 
         for i in range(8):
             if cidr >= 16:
-                mask += 'FFFF'
+                mask += 'ffff'
 
             else:
                 mask += IPv6._toHexadecimal(2 ** cidr - 1).zfill(4)
