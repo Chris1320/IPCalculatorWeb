@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>IPv6 address conversion</h2>
+        <form action="{{ url_for('ipv6Calculator') }}" method="POST">
+            <table style="width: 40%;">
+                <tr>
+                    <td><label for="ipAddress">IP address:</label></td>
+                    <td><input type="text" id="ipAddress" name="ipAddress" placeholder="2001:0db8:0000:0000:0000:8a2e:0370:7334" required/></td>
+                    <td><input class="button" type="submit" value="Convert"></td>
+                </tr>
+            </table>
+        </form>
+        <footer>
+            <br/><br/><br/><br/>
+            <hr/>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>IPv6 address conversion</h2>
+        <table class="border" id="indent">
+            <tbody>
+                <tr>
+                    <td><b>Hexadecimal</b></td>
+                    <td>{{ ip.hexadecimal }}</td>
+                </tr>
+                <tr>
+                    <td><b>Shortened Form</b></td>
+                    <td>{{ ip.short_hex }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <br/><br/><br/>
+            <h3>IPv6 Addressing</h3>
+            <p style="margin-left: 16px; margin-right: 16px;">In IPv6, there are eight hextets that can have a value between <code>0000</code> and <code>FFFF</code> inclusive. Each hextet can have leading 0s removed, and hextets with values of 0 ompletely omitted.</p>
+        </div>
+        <footer>
+            <br/><br/><br/><br/>
+            <hr/>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
+    </body>
+</html>

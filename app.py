@@ -1,5 +1,6 @@
 import os
 import sys
+import ipaddress
 import subprocess
 from typing import Final
 from typing import Iterable
@@ -252,6 +253,95 @@ def getMaskFromNeededHosts(hosts: int, use_total: bool = False) -> SubnetMask | 
 
     return None
 
+
+class IPv6:
+    def __init__(self, ip: str):
+        # Check if the ip is a valid IPv6 address.
+        if not IPv6.isValidIP(ip):
+            raise ValueError("Invalid IPv6 address.")
+
+        self._ip: str = IPv6._expandIP(ip)
+
+    @property
+    def hexadecimal(self) -> str:
+        return self._ip
+
+    @property
+    def short_hex(self) -> str:
+        return IPv6._shortenIP(self._ip)
+
+    @staticmethod
+    def _toHexadecimal(value: int) -> str:
+        """
+        Convert to Hexadecimal number system.
+        """
+
+        quotient = value
+        result = ''
+        letters = {
+            10: 'A',
+            11: 'B',
+            12: 'C',
+            13: 'D',
+            14: 'E',
+            15: 'F'
+        }
+
+        while quotient > 0:
+            remainder = quotient % 16  # Get the remainder.
+            # If remainder is > 10, replace it with equivalent hex letter.
+            result += str(remainder) if remainder < 10 else letters[remainder]
+            quotient = quotient // 16
+
+        return result[::-1]
+
+    @staticmethod
+    def _toDecimal(value: str) -> int:
+        """
+        Convert to decimal number system.
+        """
+
+        letters = {
+            'A': 10,
+            'B': 11,
+            'C': 12,
+            'D': 13,
+            'E': 14,
+            'F': 15
+        }
+
+        exponent = 0  # The exponent of the right-most binary digit.
+        result = 0
+
+        for digit in value[::-1]:
+            digit = letters[digit.upper()] if not digit.isdigit() else digit
+            result += int(digit) * (16 ** exponent)
+
+            exponent += 1  # Get the place value of the next octal digit.
+
+        return result
+
+    @staticmethod
+    def isValidIP(ip_to_check: str) -> bool:
+        """
+        Check if it is a valid IPv6 address.
+        """
+
+        try:
+            ipaddress.IPv6Address(ip_to_check)
+            return True
+
+        except ipaddress.AddressValueError:
+            return False
+
+    @staticmethod
+    def _shortenIP(ip: str) -> str:
+        ipv6 = ipaddress.IPv6Address(ip)
+        return ipv6.compressed
+
+    @staticmethod
+    def _expandIP(ip: str) -> str:
+        return ipaddress.IPv6Address(ip).exploded
 
 # Helper functions to be used in jinja templates
 def getBroadcastAddr(network: Network):
@@ -625,8 +715,20 @@ def shareDesignANetworkVLSM():
 
 
 @app.route("/ipv6-calculator", methods=["GET", "POST"])
-def IPv6Calculator():
-    return render_template("error.html", desc="Oh no! The developer lost all his brain cells trying to understand this thing.")
+def ipv6Calculator():
+    if request.method == "POST":
+        try:
+            ip = IPv6(request.form["ipAddress"])
+            return render_template(
+                "ipv6-calculator-result.html",
+                ip = ip
+            )
+
+        except Exception as e:
+            return render_template("error.html", desc = e)
+
+    else:
+        return render_template("ipv6-calculator.html")
 
 
 def main():
