@@ -409,7 +409,7 @@ class IPv6SubnetMask(IPv6):
                 mask += 'ffff'
 
             else:
-                mask += IPv6._toHexadecimal(2 ** cidr - 1).zfill(4)
+                mask += IPv6._toHexadecimal(2 ** cidr - 1).ljust(4, '0')
 
             cidr -= 16
 
@@ -419,43 +419,25 @@ class IPv6SubnetMask(IPv6):
         return mask
 
 
-# Helper functions to be used in jinja templates
-def getBroadcastAddr(network: Network):
-    try:
-        return network.broadcast_address.decimal
+def getIPv6MaskFromNeededHosts(hosts: int) -> IPv6SubnetMask | None:
+    """
+    Get the smallest subnet mask that an fit the number of hosts.
+    """
 
-    except ValueError as e:
-        return e
+    for i in range(128):
+        if 2 ** i >= hosts:
+            return IPv6SubnetMask(f"/{128 - i}")
 
-
-def getAltInterval(network: Network):
-    return "or 1" if network.subnet_mask.interval == 256 else ''
-
-
-def getFirstUsable(network: Network):
-    try:
-        return network.first_and_last_usable[0].decimal
-
-    except ValueError as e:
-        return e
-
-
-def getLastUsable(network: Network):
-    try:
-        return network.first_and_last_usable[1].decimal
-
-    except ValueError as e:
-        return e
+    return None
 
 
 def renderNetworkInfo(networks: Iterable[Network], share_url: str) -> str:
     return render_template(
         "network-info-result.html",
         title = "Get network information",
-        getBroadcastAddr = getBroadcastAddr,
-        getAltInterval = getAltInterval,
-        getFirstUsable = getFirstUsable,
-        getLastUsable = getLastUsable,
+        getBroadcastAddr = lambda x: x.broadcast_address.decimal,
+        getFirstUsable = lambda x: x.first_and_last_usable[0].decimal,
+        getLastUsable = lambda x: x.first_and_last_usable[1].decimal,
         networks = networks,
         share_url = share_url
     )
@@ -822,6 +804,28 @@ def ipv6SubnetMaskCalculator():
 
     else:
         return render_template("ipv6-subnet-mask-calculator.html")
+
+
+@app.route("/ipv6-subnet-mask-from-total-hosts", methods = ["GET", "POST"])
+def ipv6SubnetMaskFromTotalHosts() -> str:
+    if request.method == "POST":
+        try:
+            hosts = int(request.form["hosts"])
+            mask = getIPv6MaskFromNeededHosts(hosts)
+            if mask is None:
+                return render_template("error.html", desc="No subnet mask can fit that many hosts.")
+
+            else:
+                return render_template(
+                    "ipv6-subnet-mask-from-total-hosts-result.html",
+                    mask = mask
+                )
+
+        except Exception as e:
+            return render_template("error.html", desc = e)
+
+    else:
+        return render_template("ipv6-subnet-mask-from-total-hosts.html")
 
 
 def main():

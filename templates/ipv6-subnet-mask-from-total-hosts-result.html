@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>Get IPv6 subnet mask from number of usable hosts</h2>
+        <p style="margin-left: 16px; margin-right: 16px;">This subnet mask can fit {{ mask.total }} hosts.</p>
+        <table class="border", id="indent">
+            <tr>
+                <th><b>Hexadecimal</b></th>
+                <td>{{ mask.hexadecimal }}</td>
+            </tr>
+            <tr>
+                <th><b>Shortened Form</b></th>
+                <td>{{ mask.short_hex }}</td>
+            </tr>
+            <tr>
+                <th><b>CIDR</b></th>
+                <td>/{{ mask.cidr }}</td>
+            </tr>
+        </table>
+        <footer>
+            <br/><br/><br/><br/>
+            <hr/>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
+    </body>
+</html>

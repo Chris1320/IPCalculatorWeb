@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Address Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>IP Address Calculator</h1>
+        <h2>Get IPv6 subnet mask from number of total hosts</h2>
+        <form action="{{ url_for('ipv6SubnetMaskFromTotalHosts') }}" method="POST">
+            <table style="width: 35%;">
+                <tr>
+                    <td><label for="hosts">Enter number of hosts needed: </label><br/>
+                    <td><input type="text" id="hosts" name="hosts" placeholder="255" required/><br/>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Convert"></td>
+                </tr>
+            </table>
+        </form>
+        <footer>
+            <br/><br/><br/><br/>
+            <hr/>
+            <ul>
+                <a href="{{ url_for('indexPage') }}">Back to home</a><br/>
+                <a href="https://github.com/Chris1320/IPCalculatorWeb">View on GitHub</a><br/>
+            </ul>
+        </footer>
+    </body>
+</html>
