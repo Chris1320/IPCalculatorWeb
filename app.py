@@ -16,7 +16,7 @@ from flask_limiter.util import get_remote_address
 
 SECRET_KEY: Final[str] = os.getenv("SECRET_KEY", os.urandom(16).hex())
 CWD: str = os.getenv("APP_CWD", os.getcwd())
-DEBUG: bool = True if os.getenv("DEBUG_MODE", '').lower() == "true" else False
+DEBUG: bool = os.getenv("DEBUG_MODE", '').lower() == "true"
 
 
 print(f"{SECRET_KEY=}")
@@ -209,27 +209,23 @@ class Network:
                 network_octets[3] = str(int(network_octets[3]) + n)
                 break
 
-            else:
-                n -= 256 - int(network_octets[3])
-                network_octets[3] = '0'
-                if int(network_octets[2]) + 1 <= 255:
-                    network_octets[2] = str(int(network_octets[2]) + 1)
-                    continue
+            n -= 256 - int(network_octets[3])
+            network_octets[3] = '0'
+            if int(network_octets[2]) + 1 <= 255:
+                network_octets[2] = str(int(network_octets[2]) + 1)
+                continue
 
-                else:
-                    network_octets[2] = '0'
-                    if int(network_octets[1]) + 1 <= 255:
-                        network_octets[1] = str(int(network_octets[1]) + 1)
-                        continue
+            network_octets[2] = '0'
+            if int(network_octets[1]) + 1 <= 255:
+                network_octets[1] = str(int(network_octets[1]) + 1)
+                continue
 
-                    else:
-                        network_octets[1] = '0'
-                        if int(network_octets[0]) + 1 <= 255:
-                            network_octets[0] = str(int(network_octets[0]) + 1)
-                            continue
+            network_octets[1] = '0'
+            if int(network_octets[0]) + 1 <= 255:
+                network_octets[0] = str(int(network_octets[0]) + 1)
+                continue
 
-                        else:
-                            raise ValueError("Too many hosts.")
+            raise ValueError("Too many hosts.")
 
         return IPAddress('.'.join(network_octets))
 
@@ -480,7 +476,8 @@ def hooksGitPull():
     try:
         subprocess.run(
             ["git", "pull"],
-            cwd = CWD
+            cwd = CWD,
+            check = False
         )
         print(f"[i] Updated to {getCommitHash()}")
         return "OK"
@@ -533,19 +530,17 @@ def subnetMaskFromUsableHosts() -> str:
             if mask is None:
                 return render_template("error.html", desc="No subnet mask can fit that many hosts.")
 
+            if use_total:
+                desc = f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses."
+
             else:
-                if use_total:
-                    desc = f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses."
+                desc = f"This subnet mask can fit {mask.usable} hosts."
 
-                else:
-                    desc = f"This subnet mask can fit {mask.usable} hosts."
-
-                return render_template(
-                    "subnet-mask-from-usable-hosts-result.html",
-                    desc = desc,
-                    mask = mask
-                )
-
+            return render_template(
+                "subnet-mask-from-usable-hosts-result.html",
+                desc = desc,
+                mask = mask
+            )
 
         except Exception as e:
             return render_template("error.html", desc = e)
@@ -677,7 +672,10 @@ def designANetworkVLSM() -> str:
             if request.form.get("networks", None) is None:
                 # This is the first part of the form.
                 try:
-                    return render_template("design-a-network-vlsm2.html", n = int(request.form.get("num_of_networks", 1)))
+                    return render_template(
+                        "design-a-network-vlsm2.html",
+                        n = int(request.form.get("num_of_networks", 1))
+                    )
 
                 except ValueError:
                     return render_template("error.html", desc="Please enter a valid number.")
@@ -696,7 +694,10 @@ def designANetworkVLSM() -> str:
                         if mask.endswith('h'):
                             mask = getMaskFromNeededHosts(int(mask[:-1]), False)
                             if mask is None:
-                                return render_template("error.html", desc="No subnet mask can fit that many hosts.")
+                                return render_template(
+                                    "error.html",
+                                    desc = "No subnet mask can fit that many hosts."
+                                )
 
                         else:
                             mask = SubnetMask(mask)
@@ -815,11 +816,10 @@ def ipv6SubnetMaskFromTotalHosts() -> str:
             if mask is None:
                 return render_template("error.html", desc="No subnet mask can fit that many hosts.")
 
-            else:
-                return render_template(
-                    "ipv6-subnet-mask-from-total-hosts-result.html",
-                    mask = mask
-                )
+            return render_template(
+                "ipv6-subnet-mask-from-total-hosts-result.html",
+                mask = mask
+            )
 
         except Exception as e:
             return render_template("error.html", desc = e)
