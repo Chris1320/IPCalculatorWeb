@@ -531,7 +531,10 @@ def subnetMaskFromUsableHosts() -> str:
                 return render_template("error.html", desc="No subnet mask can fit that many hosts.")
 
             if use_total:
-                desc = f"This subnet mask can fit {mask.total} hosts, including network and broadcast addresses."
+                desc = (
+                    f"This subnet mask can fit {mask.total} hosts, "
+                    "including network and broadcast addresses."
+                )
 
             else:
                 desc = f"This subnet mask can fit {mask.usable} hosts."
@@ -671,62 +674,49 @@ def designANetworkVLSM() -> str:
             # Check if user finished the first part of the form
             if request.form.get("networks", None) is None:
                 # This is the first part of the form.
-                try:
-                    return render_template(
-                        "design-a-network-vlsm2.html",
-                        n = int(request.form.get("num_of_networks", 1))
-                    )
-
-                except ValueError:
-                    return render_template("error.html", desc="Please enter a valid number.")
-
-                except Exception as e:
-                    return render_template("error.html", desc=e)
-
-            else:
-                # This is the 2nd part of the form.
-                first_network_address = IPAddress(request.form["ipAddress"])
-                network_quantity = int(request.form["networks"])
-                network_masks = []
-                for i in range(network_quantity):
-                    try:
-                        mask = request.form[f"mask{i}"]
-                        if mask.endswith('h'):
-                            mask = getMaskFromNeededHosts(int(mask[:-1]), False)
-                            if mask is None:
-                                return render_template(
-                                    "error.html",
-                                    desc = "No subnet mask can fit that many hosts."
-                                )
-
-                        else:
-                            mask = SubnetMask(mask)
-
-                        network_masks.append(mask)
-
-                    except ValueError as e:
-                        return render_template("error.html", desc=e)
-
-                # sort network_masks by number of hosts
-                network_masks.sort(key=lambda x: x.usable, reverse=True)
-
-                # Save the first network address in
-                # decimal form for sharing the result.
-                first_network_address_share = first_network_address.decimal
-                networks: list[Network] = []
-                for _, mask in enumerate(network_masks):
-                    networks.append(Network(first_network_address, mask))
-                    first_network_address = networks[-1].next(mask.total)
-
-                return renderNetworkInfo(
-                    networks = networks,
-                    share_url = url_for(
-                        "shareDesignANetworkVLSM",
-                        first = first_network_address_share,
-                        masks = ','.join([f"/{str(mask.cidr)}" for mask in network_masks]),
-                        n = network_quantity
-                    )
+                return render_template(
+                    "design-a-network-vlsm2.html",
+                    n = int(request.form.get("num_of_networks", 1))
                 )
+
+            # This is the 2nd part of the form.
+            first_network_address = IPAddress(request.form["ipAddress"])
+            network_quantity = int(request.form["networks"])
+            network_masks = []
+            for i in range(network_quantity):
+                mask = request.form[f"mask{i}"]
+                if mask.endswith('h'):
+                    mask = getMaskFromNeededHosts(int(mask[:-1]), False)
+                    if mask is None:
+                        raise ValueError(
+                            "No subnet mask can fit that many hosts."
+                        )
+
+                else:
+                    mask = SubnetMask(mask)
+
+                network_masks.append(mask)
+
+            # sort network_masks by number of hosts
+            network_masks.sort(key=lambda x: x.usable, reverse=True)
+
+            # Save the first network address in
+            # decimal form for sharing the result.
+            first_network_address_share = first_network_address.decimal
+            networks: list[Network] = []
+            for _, mask in enumerate(network_masks):
+                networks.append(Network(first_network_address, mask))
+                first_network_address = networks[-1].next(mask.total)
+
+            return renderNetworkInfo(
+                networks = networks,
+                share_url = url_for(
+                    "shareDesignANetworkVLSM",
+                    first = first_network_address_share,
+                    masks = ','.join([f"/{str(mask.cidr)}" for mask in network_masks]),
+                    n = network_quantity
+                )
+            )
 
         except Exception as e:
             return render_template("error.html", desc=e)
